@@ -8,3 +8,5 @@ create table users(
     primary key (seq),
     constraint ung_user_email unique(email)
 );
+
+insert into users(email, passwd) values('junho@gmail.com', '1234');
