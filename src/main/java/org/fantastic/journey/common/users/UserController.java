@@ -1,19 +1,21 @@
 package org.fantastic.journey.common.users;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
 
-    private final UserBean userBean;
+    private final UserRepository userRepository;
 
-    public UserController(UserBean userBean) {
-        this.userBean = userBean;
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/user")
-    public String user() {
-        return "user mail is " + userBean.findUserMail(1);
+    public List<User> user() {
+        return userRepository.findUser();
     }
 }
