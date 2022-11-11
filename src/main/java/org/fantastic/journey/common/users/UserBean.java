@@ -14,12 +14,13 @@ public class UserBean {
     }
 
     public String findUserMail(int id) {
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT email");
-        query.append(" from users");
-        query.append(" where seq = 1");
+        String query = """
+                SELECT email
+                  FROM users
+                 WHERE seq = 1
+                """;
 
-        return jdbcTemplate.query(query.toString(), (rs, rowNum) -> {
+        return jdbcTemplate.query(query, (rs, rowNum) -> {
             return rs.getString("email");
         }).toString();
     }
