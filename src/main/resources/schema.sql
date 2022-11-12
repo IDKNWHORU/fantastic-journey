@@ -1,12 +1,9 @@
 create table users(
-    seq bigint not null auto_increment,
-    email varchar(50) not null,
+    id varchar(50) not null,
     passwd varchar(80) not null,
-    login_count int not null default 0,
-    last_login_at datetime default null,
+    phone_number char(11) not null,
     create_at datetime not null default current_timestamp(),
-    primary key (seq),
-    constraint ung_user_email unique(email)
+    primary key (id),
+    constraint unq_user_phone_number unique(phone_number)
 );
-
-insert into users(email, passwd) values('junho@gmail.com', '1234');
+insert into users(id, passwd, phone_number) values('jh9341', '1234', '01000000000');

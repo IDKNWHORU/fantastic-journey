@@ -17,12 +17,10 @@ public class UserRepository {
 
     public List<User> findUser() {
         String query = """
-                SELECT email, passwd
+                SELECT id, passwd, phone_number, create_at
                   FROM users
                 """;
 
-        return (List<User>) jdbcTemplate.query(query, (rs, rowNum) -> {
-            return new User(rs.getString("email"), rs.getString("passwd"));
-        });
+        return jdbcTemplate.query(query, (rs, rowNum) -> new User(rs.getString("id"), rs.getString("passwd"), rs.getString("phone_number"), rs.getTimestamp("create_at")));
     }
 }
