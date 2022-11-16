@@ -23,8 +23,15 @@ public class ClientController {
 
     @PostMapping("/client")
     public Client createClient(@RequestBody Client newClient) {
-        clientRepository.insert(newClient);
+        Client client = Client.builder()
+                .id(newClient.getId())
+                .passwd(newClient.getPasswd())
+                .phoneNumber(newClient.getPhoneNumber())
+                .birth(newClient.getBirth())
+                .portraitShot(newClient.getPortraitShot())
+                .build();
+        clientRepository.insert(client);
 
-        return newClient;
+        return client;
     }
 }
