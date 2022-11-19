@@ -24,11 +24,10 @@ public class ClientController {
     @PostMapping("/client")
     public Client createClient(@RequestBody Client newClient) {
         Client client = Client.builder()
-                .id(newClient.getId())
-                .passwd(newClient.getPasswd())
+                .name(newClient.getName())
                 .phoneNumber(newClient.getPhoneNumber())
                 .birth(newClient.getBirth())
-                .portraitShot(newClient.getPortraitShot())
+                .photo(newClient.getPhoto())
                 .build();
         clientRepository.insert(client);
 
