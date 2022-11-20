@@ -10,7 +10,8 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @Builder
 public class Client {
-    private @Id @With String name;
+    private @Id @With String id;
+    private String name;
     private String phoneNumber;
     private String birth;
     private String photo;
