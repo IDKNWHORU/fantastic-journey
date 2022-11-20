@@ -13,8 +13,8 @@ public class Client {
     private @Id @With String id;
     private String name;
     private String phoneNumber;
-    private String birth;
-    private String photo;
+    private String birthAt;
+    private String photoShot;
     private Number memberId;
     private Number cabinet;
     private String expiredAt;
