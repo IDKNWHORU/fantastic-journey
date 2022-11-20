@@ -28,6 +28,9 @@ public class ClientController {
                 .phoneNumber(newClient.getPhoneNumber())
                 .birth(newClient.getBirth())
                 .photo(newClient.getPhoto())
+                .memberId(newClient.getMemberId())
+                .cabinet(newClient.getCabinet())
+                .expiredAt(newClient.getExpiredAt())
                 .build();
         clientRepository.insert(client);
 
