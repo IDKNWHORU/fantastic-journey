@@ -1,0 +1,4 @@
+- name: Google Cloud Compute Engine Deploy
+  uses: mattes/gce-deploy-action@v5.0.0
+  with:
+    creds: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
