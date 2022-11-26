@@ -61,7 +61,7 @@ jobs:
     - run: |-
         gcloud --quiet auth configure-docker
     - run: |-
-        ./chmod +x ./gradlew
+        chmod +x ./gradlew
     - name: Gradle Build
       run: |-
         ./gradlew build
