@@ -61,12 +61,12 @@ jobs:
     - run: |-
         gcloud --quiet auth configure-docker
     - run: |-
+        java -version
+    - run: |-
         chmod +x ./gradlew
     - name: Gradle Build
       run: |-
         ./gradlew build
-    - run: |-
-        ls -al
     # Build the Docker image
     - name: Build
       run: |-
