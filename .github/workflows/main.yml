@@ -49,7 +49,7 @@ jobs:
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v1'
       with:
-        service_account: ${{ secrets.GCE_SA }}
+        credentials_json: ${{ secrets.GCE_SA_KEY }}
 
     # Alternative option - authentication via credentials json
     # - id: 'auth'
