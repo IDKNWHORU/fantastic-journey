@@ -60,6 +60,8 @@ jobs:
     # helper for authentication
     - run: |-
         gcloud --quiet auth configure-docker
+    - run: |-
+        ls -al
     # Build the Docker image
     - name: Build
       run: |-
