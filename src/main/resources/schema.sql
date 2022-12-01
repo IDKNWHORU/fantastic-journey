@@ -2,7 +2,7 @@ create table client (
 	id uuid not null,
 	name varchar(50) not null,
 	phone_number char(11),
-	birth char(8),
+	birth_at char(8),
 	member_id varchar(10),
 	constraint constraint_client_uk unique (member_id),
 	constraint constraint_client_pk primary key (id,name)
@@ -43,3 +43,14 @@ create table counsel (
     client uuid not null,
     constraint constraint_counsel primary key(comment, create_at)
 );
+
+insert into product (name, term) values ('헬스', 1);
+insert into product (name, term) values ('헬스', 3);
+insert into product (name, term) values ('헬스', 6);
+insert into product (name, term) values ('헬스', 9);
+insert into product (name, term) values ('헬스', 12);
+insert into product (name, term) values ('요가', 1);
+insert into product (name, term) values ('요가', 3);
+insert into product (name, term) values ('요가', 6);
+insert into product (name, term) values ('요가', 9);
+insert into product (name, term) values ('요가', 12);

@@ -1,21 +1,19 @@
 package org.fantastic.journey.common.clients;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.With;
-import org.springframework.data.annotation.Id;
+import lombok.Getter;
 
-@Data
-@AllArgsConstructor
+import java.util.List;
+
+@Getter
 @Builder
 public class Client {
-    private @Id @With String id;
+    private String id;
     private String name;
     private String phoneNumber;
     private String birthAt;
-    private String photoShot;
-    private Number memberId;
-    private Number cabinet;
-    private String expiredAt;
+    private String memberId;
+
+    private Cabinet cabinet;
+    private List<Product> products;
 }
