@@ -26,14 +26,34 @@ public class ClientController {
     @GetMapping("/clients")
     public List<Client> getClients() {
         String clientsQuery = """
-                select *
-                  from client;
+                select c.id, name, phone_number, birth_at, member_id, d.cabinet, e.start_at cabinet_start_at, e.expire_at cabinet_expire_at
+                  from client c
+                  left join member d
+                    on c.id = d.client
+                  left join cabinet e
+                    on d.cabinet = e.id
                 """;
 
         return repo.query(clientsQuery, (rs) -> {
             List<Client> clients = new ArrayList<>();
             if (rs.next()) {
-                clients.add(Client.builder().id(rs.getString("id")).name(rs.getString("name")).phoneNumber(rs.getString("phone_number")).birthAt(rs.getString("birth_at")).memberId(rs.getString("member_id")).build());
+                Cabinet cabinet = null;
+
+                if (rs.getString("cabinet") != null) {
+                    cabinet = new Cabinet();
+                    cabinet.setId(rs.getInt("cabinet"));
+                    cabinet.setStartAt(rs.getString("cabinet_start_at"));
+                    cabinet.setExpireAt(rs.getString("cabinet_expire_at"));
+                }
+
+                clients.add(Client.builder()
+                        .id(rs.getString("id"))
+                        .name(rs.getString("name"))
+                        .phoneNumber(rs.getString("phone_number"))
+                        .birthAt(rs.getString("birth_at"))
+                        .memberId(rs.getString("member_id"))
+                        .cabinet(cabinet)
+                        .build());
             }
             return clients;
         });
@@ -46,6 +66,8 @@ public class ClientController {
                 values (?, ?, ?, ?, ?)
                 """;
         String clientId = UUID.randomUUID().toString();
+        Cabinet newCabinet = null;
+        Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
 
         this.repo.update(createClientQuery,
                 clientId,
@@ -54,12 +76,31 @@ public class ClientController {
                 newClient.getOrDefault("birthAt", "        ").toString(),
                 newClient.getOrDefault("member_id", "").toString());
 
+        if (cabinet != null) {
+            newCabinet = new Cabinet();
+            newCabinet.setId((int) cabinet.get("id"));
+            newCabinet.setStartAt(cabinet.get("start_at").toString());
+            newCabinet.setExpireAt(cabinet.get("expire_at").toString());
+            this.repo.update("""
+                             insert into cabinet(id, start_at, expire_at)
+                             values (?, ?, ?)
+                            """, cabinet.get("id"),
+                    cabinet.get("start_at"),
+                    cabinet.get("expire_at"));
+            this.repo.update("""
+                            insert into member(client, cabinet)
+                            values (?, ?)
+                            """,
+                    clientId, cabinet.get("id"));
+        }
+
         return Client.builder()
                 .id(clientId)
                 .name(newClient.get("name").toString())
                 .phoneNumber(newClient.getOrDefault("phoneNumber", "           ").toString())
                 .birthAt(newClient.getOrDefault("birthAt", "        ").toString())
                 .memberId(newClient.getOrDefault("member_id", "").toString())
+                .cabinet(newCabinet)
                 .build();
     }
 //
