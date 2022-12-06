@@ -1,13 +1,16 @@
 package org.fantastic.journey.common.clients;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ClientController {
@@ -27,10 +30,10 @@ public class ClientController {
                   from client;
                 """;
 
-        return repo.query(clientsQuery, (rs)-> {
+        return repo.query(clientsQuery, (rs) -> {
             List<Client> clients = new ArrayList<>();
-            if(rs.next()) {
-                clients.add(Client.builder().id("").name("").birthAt("").memberId("").build());
+            if (rs.next()) {
+                clients.add(Client.builder().id(rs.getString("id")).name(rs.getString("name")).phoneNumber(rs.getString("phone_number")).birthAt(rs.getString("birth_at")).memberId(rs.getString("member_id")).build());
             }
             return clients;
         });
@@ -40,12 +43,24 @@ public class ClientController {
     public Client createClient(@RequestBody Map<String, Object> newClient) {
         String createClientQuery = """
                 insert into client (id, name, phone_number, birth_at, member_id)
-                values (?, ?, ?, ?, ?, ?)
+                values (?, ?, ?, ?, ?)
                 """;
+        String clientId = UUID.randomUUID().toString();
 
-//        this.repo.query(createClientQuery);
+        this.repo.update(createClientQuery,
+                clientId,
+                newClient.get("name").toString(),
+                newClient.getOrDefault("phoneNumber", "           ").toString(),
+                newClient.getOrDefault("birthAt", "        ").toString(),
+                newClient.getOrDefault("member_id", "").toString());
 
-        return Client.builder().id(UUID.randomUUID().toString()).name(newClient.get("name").toString()).build();
+        return Client.builder()
+                .id(clientId)
+                .name(newClient.get("name").toString())
+                .phoneNumber(newClient.getOrDefault("phoneNumber", "           ").toString())
+                .birthAt(newClient.getOrDefault("birthAt", "        ").toString())
+                .memberId(newClient.getOrDefault("member_id", "").toString())
+                .build();
     }
 //
 //    @PutMapping("/client")
