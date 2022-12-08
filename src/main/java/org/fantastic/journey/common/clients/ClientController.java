@@ -68,13 +68,18 @@ public class ClientController {
         String clientId = UUID.randomUUID().toString();
         Cabinet newCabinet = null;
         Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
+        List<Map<String, Object>> products = (List) newClient.get("products");
+
+        String memberId = null;
+        if (newClient.get("member_id") != null)
+            memberId = newClient.get("member_id").toString();
 
         this.repo.update(createClientQuery,
                 clientId,
                 newClient.get("name").toString(),
                 newClient.getOrDefault("phoneNumber", "           ").toString(),
                 newClient.getOrDefault("birthAt", "        ").toString(),
-                newClient.getOrDefault("member_id", "").toString());
+                memberId);
 
         if (cabinet != null) {
             newCabinet = new Cabinet();
@@ -94,12 +99,29 @@ public class ClientController {
                     clientId, cabinet.get("id"));
         }
 
+        if (products != null) {
+            products.forEach(product -> {
+                Product newProduct = new Product();
+
+                newProduct.setName(product.get("name").toString());
+                newProduct.setStart_at(product.get("start_at").toString());
+                newProduct.setExpire_at(product.get("expire_at").toString());
+
+                System.out.println(newProduct);
+
+                this.repo.update("""
+                        insert into member_product(client, product, start_at, expire_at)
+                        values (?, ?, ?, ?);
+                        """, clientId, newProduct.getName(), newProduct.getStart_at(), newProduct.getExpire_at());
+            });
+        }
+
         return Client.builder()
                 .id(clientId)
                 .name(newClient.get("name").toString())
                 .phoneNumber(newClient.getOrDefault("phoneNumber", "           ").toString())
                 .birthAt(newClient.getOrDefault("birthAt", "        ").toString())
-                .memberId(newClient.getOrDefault("member_id", "").toString())
+                .memberId(memberId)
                 .cabinet(newCabinet)
                 .build();
     }
