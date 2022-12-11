@@ -69,6 +69,7 @@ public class ClientController {
         Cabinet newCabinet = null;
         Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
         List<Map<String, Object>> products = (List) newClient.get("products");
+        List<Product> newProducts = new ArrayList<>();
 
         String memberId = null;
         if (newClient.get("member_id") != null)
@@ -107,7 +108,7 @@ public class ClientController {
                 newProduct.setStart_at(product.get("start_at").toString());
                 newProduct.setExpire_at(product.get("expire_at").toString());
 
-                System.out.println(newProduct);
+                newProducts.add(newProduct);
 
                 this.repo.update("""
                         insert into member_product(client, product, start_at, expire_at)
@@ -123,6 +124,7 @@ public class ClientController {
                 .birthAt(newClient.getOrDefault("birthAt", "        ").toString())
                 .memberId(memberId)
                 .cabinet(newCabinet)
+                .products(newProducts)
                 .build();
     }
 //
