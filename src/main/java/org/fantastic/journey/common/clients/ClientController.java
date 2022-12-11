@@ -26,13 +26,13 @@ public class ClientController {
     @GetMapping("/clients")
     public List<Client> getClients() {
         String clientsQuery = """
-                select id, name, phone_number, birth_at, member_id
-                  from client c
+                SELECT *
+                  FROM CLIENT
                 """;
 
         return repo.query(clientsQuery, (rs) -> {
             List<Client> clients = new ArrayList<>();
-            if (rs.next()) {
+            while (rs.next()) {
                 clients.add(Client.builder()
                         .id(rs.getString("id"))
                         .name(rs.getString("name"))
