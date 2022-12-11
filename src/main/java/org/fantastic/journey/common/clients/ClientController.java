@@ -67,19 +67,28 @@ public class ClientController {
                 """;
         String clientId = UUID.randomUUID().toString();
         Cabinet newCabinet = null;
+
         Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
         List<Map<String, Object>> products = (List) newClient.get("products");
         List<Product> newProducts = new ArrayList<>();
 
         String memberId = null;
+        String phoneNumber = null;
+        String birthAt = null;
         if (newClient.get("member_id") != null)
             memberId = newClient.get("member_id").toString();
+
+        if (newClient.get("phoneNumber") != null)
+            phoneNumber = newClient.get("phoneNumber").toString();
+
+        if (newClient.get("birthAt") != null)
+            birthAt = newClient.get("birthAt").toString();
 
         this.repo.update(createClientQuery,
                 clientId,
                 newClient.get("name").toString(),
-                newClient.getOrDefault("phoneNumber", "           ").toString(),
-                newClient.getOrDefault("birthAt", "        ").toString(),
+                phoneNumber,
+                birthAt,
                 memberId);
 
         if (cabinet != null) {
@@ -120,8 +129,8 @@ public class ClientController {
         return Client.builder()
                 .id(clientId)
                 .name(newClient.get("name").toString())
-                .phoneNumber(newClient.getOrDefault("phoneNumber", "           ").toString())
-                .birthAt(newClient.getOrDefault("birthAt", "        ").toString())
+                .phoneNumber(phoneNumber)
+                .birthAt(birthAt)
                 .memberId(memberId)
                 .cabinet(newCabinet)
                 .products(newProducts)
