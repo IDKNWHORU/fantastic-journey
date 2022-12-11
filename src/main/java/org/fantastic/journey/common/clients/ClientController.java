@@ -26,33 +26,19 @@ public class ClientController {
     @GetMapping("/clients")
     public List<Client> getClients() {
         String clientsQuery = """
-                select c.id, name, phone_number, birth_at, member_id, d.cabinet, e.start_at cabinet_start_at, e.expire_at cabinet_expire_at
+                select id, name, phone_number, birth_at, member_id
                   from client c
-                  left join member d
-                    on c.id = d.client
-                  left join cabinet e
-                    on d.cabinet = e.id
                 """;
 
         return repo.query(clientsQuery, (rs) -> {
             List<Client> clients = new ArrayList<>();
             if (rs.next()) {
-                Cabinet cabinet = null;
-
-                if (rs.getString("cabinet") != null) {
-                    cabinet = new Cabinet();
-                    cabinet.setId(rs.getInt("cabinet"));
-                    cabinet.setStartAt(rs.getString("cabinet_start_at"));
-                    cabinet.setExpireAt(rs.getString("cabinet_expire_at"));
-                }
-
                 clients.add(Client.builder()
                         .id(rs.getString("id"))
                         .name(rs.getString("name"))
                         .phoneNumber(rs.getString("phone_number"))
                         .birthAt(rs.getString("birth_at"))
                         .memberId(rs.getString("member_id"))
-                        .cabinet(cabinet)
                         .build());
             }
             return clients;
