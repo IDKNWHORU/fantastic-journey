@@ -2,10 +2,7 @@ package org.fantastic.journey.common.clients;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +118,67 @@ public class ClientController {
                 .cabinet(newCabinet)
                 .products(newProducts)
                 .build();
+    }
+
+    @GetMapping("/client/{id}")
+    public Object getClientInfo(@PathVariable("id") String clientId) {
+        String findClientQuery = """
+                WITH mpvt AS (
+                    SELECT client, group_concat(concat(mp.PRODUCT, ';', mp.start_at, ';', mp.expire_at)) AS products
+                      FROM MEMBER_PRODUCT mp
+                     GROUP BY CLIENT
+                      )
+                SELECT cl.id, cl.name, cl.PHONE_NUMBER, cl.birth_at, cl.MEMBER_ID, mb.CABINET, cb.START_AT, cb.EXPIRE_AT, mpvt.products
+                  FROM client cl
+                  LEFT JOIN member mb
+                    ON cl.id = mb.client
+                  LEFT JOIN cabinet cb
+                    ON mb.CABINET = cb.id
+                  LEFT JOIN mpvt
+                    ON cl.id = mpvt.client
+                """;
+
+
+        return repo.query(findClientQuery, (rs) -> {
+            List<Client> clients = new ArrayList<>();
+            while (rs.next()) {
+                Cabinet allocatedCabinet = rs.getInt("cabinet") > 0 ? new Cabinet(): null;
+
+                if (allocatedCabinet != null) {
+                    allocatedCabinet.setId(rs.getInt("cabinet"));
+                    allocatedCabinet.setStartAt(rs.getString("start_at"));
+                    allocatedCabinet.setExpireAt(rs.getString("expire_at"));
+                }
+
+                String[] products = rs.getString("products").split(",");
+
+                List<Product> memberProduct = products.length > 0 ? new ArrayList<>(): null;
+
+                if (memberProduct != null) {
+                    for(String productStr: products) {
+                        String[] productInfo = productStr.split(";");
+                        Product product = new Product();
+
+                        product.setName(productInfo[0]);
+                        product.setStart_at(productInfo[1]);
+                        product.setExpire_at(productInfo[2]);
+
+                        memberProduct.add(product);
+                    }
+                }
+
+                clients.add(Client.builder()
+                        .id(rs.getString("id"))
+                        .name(rs.getString("name"))
+                        .phoneNumber(rs.getString("phone_number"))
+                        .birthAt(rs.getString("birth_at"))
+                        .memberId(rs.getString("member_id"))
+                        .cabinet(allocatedCabinet)
+                        .products(memberProduct)
+                        .build());
+            }
+            return clients;
+        });
     }
 //
 //    @PutMapping("/client")
