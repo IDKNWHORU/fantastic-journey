@@ -136,10 +136,11 @@ public class ClientController {
                     ON mb.CABINET = cb.id
                   LEFT JOIN mpvt
                     ON cl.id = mpvt.client
+                 WHERE cl.id = ?
                 """;
 
 
-        return repo.query(findClientQuery, (rs) -> {
+        return repo.query(findClientQuery, new Object[]{clientId}, (rs) -> {
             List<Client> clients = new ArrayList<>();
             while (rs.next()) {
                 Cabinet allocatedCabinet = rs.getInt("cabinet") > 0 ? new Cabinet(): null;
@@ -150,12 +151,12 @@ public class ClientController {
                     allocatedCabinet.setExpireAt(rs.getString("expire_at"));
                 }
 
-                String[] products = rs.getString("products").split(",");
+                String productsStr = rs.getString("products");
 
-                List<Product> memberProduct = products.length > 0 ? new ArrayList<>(): null;
+                List<Product> memberProduct = productsStr != null ? new ArrayList<>(): null;
 
-                if (memberProduct != null) {
-                    for(String productStr: products) {
+                if (productsStr != null) {
+                    for(String productStr: productsStr.split(",")) {
                         String[] productInfo = productStr.split(";");
                         Product product = new Product();
 
