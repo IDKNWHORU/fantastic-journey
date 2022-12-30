@@ -58,8 +58,8 @@ public class ClientController {
         String memberId = null;
         String phoneNumber = null;
         String birthAt = null;
-        if (newClient.get("member_id") != null)
-            memberId = newClient.get("member_id").toString();
+        if (newClient.get("memberId") != null)
+            memberId = newClient.get("memberId").toString();
 
         if (newClient.get("phoneNumber") != null)
             phoneNumber = newClient.get("phoneNumber").toString();
@@ -181,11 +181,4 @@ public class ClientController {
             return clients;
         });
     }
-//
-//    @PutMapping("/client")
-//    public Client updateClient(@RequestBody Client updatedClient) {
-//        clientRepository.save(updatedClient);
-//
-//        return updatedClient;
-//    }
 }
