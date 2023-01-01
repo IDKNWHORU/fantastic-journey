@@ -27,4 +27,13 @@ public class CabinetService {
 
         return this.repo.update(addMemberCabinetQuery, client, cabinet);
     }
+
+    public int deleteCabinet(int cabinet) {
+        String deleteCabinetQuery = """
+                delete from cabinet
+                 where id = ?
+                """;
+
+        return this.repo.update(deleteCabinetQuery, cabinet);
+    }
 }

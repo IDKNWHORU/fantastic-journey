@@ -116,6 +116,14 @@ public class ClientController {
         List<Map<String, Object>> products = (List) newClient.get("products");
         List<Product> newProducts = new ArrayList<>();
 
+        Cabinet newCabinet = cabinet == null ? null : getCabinet((int)cabinet.get("id"), cabinet.get("start_at").toString(), cabinet.get("expire_at").toString());
+
+        if(newCabinet != null) {
+            CabinetService cabinetService = new CabinetService(this.repo);
+
+            cabinetService.addCabinet(newCabinet);
+        }
+
         String memberId = null;
         String phoneNumber = null;
         String birthAt = null;
@@ -128,20 +136,26 @@ public class ClientController {
         if (newClient.get("birthAt") != null)
             birthAt = newClient.get("birthAt").toString();
 
-        this.repo.update(createClientQuery,
+        try {
+            this.repo.update(createClientQuery,
                 clientId,
                 newClient.get("name").toString(),
                 phoneNumber,
                 birthAt,
                 memberId);
+        } catch (Exception e) {
+            if(newCabinet != null) {
+                CabinetService cabinetService = new CabinetService(this.repo);
+                cabinetService.deleteCabinet(newCabinet.getId());
+            }
 
-        if (cabinet != null) {
-            Cabinet nc = getCabinet((int)cabinet.get("id"), cabinet.get("start_at").toString(), cabinet.get("expire_at").toString());
+            throw new Error("Error cause by creating client" + e.getMessage());
+        }
 
+        if (newCabinet != null) {
             CabinetService cabinetService = new CabinetService(this.repo);
 
-            cabinetService.addCabinet(nc);
-            cabinetService.addMemberCabinet(clientId, nc.getId());
+            cabinetService.addMemberCabinet(clientId, newCabinet.getId());
         }
 
         if (products != null) {
