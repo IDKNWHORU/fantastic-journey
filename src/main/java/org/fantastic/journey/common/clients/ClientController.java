@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -141,12 +140,8 @@ public class ClientController {
 
             CabinetService cabinetService = new CabinetService(this.repo);
 
-            try{
-                cabinetService.addCabinet(nc);
-                cabinetService.addMemberCabinet(clientId, nc.getId());
-            } catch(Exception e) {
-                System.out.println("cabinet error: "+e.getMessage());
-            }
+            cabinetService.addCabinet(nc);
+            cabinetService.addMemberCabinet(clientId, nc.getId());
         }
 
         if (products != null) {
@@ -180,6 +175,25 @@ public class ClientController {
     @PutMapping("/client/{id}")
     public Client editClient(@PathVariable("id") String clientId) {
         return new Client("","","","","", new Cabinet(), new ArrayList<>());
+    }
+
+    @GetMapping("/cabinets")
+    public List<Cabinet> getcabinets() {
+        return this.repo.query("""
+                select *
+                  from cabinet
+                """, (rs) -> {
+            List<Cabinet> cabinets = new ArrayList<>();
+            while(rs.next()) {
+                Cabinet cabinet = getCabinet(
+                        rs.getInt("id"),
+                        rs.getString("start_at"),
+                        rs.getString("expire_at"));
+
+                cabinets.add(cabinet);
+            }
+            return cabinets;
+        });
     }
 
     public Cabinet getCabinet(int id, String startAt, String expireAt) {
