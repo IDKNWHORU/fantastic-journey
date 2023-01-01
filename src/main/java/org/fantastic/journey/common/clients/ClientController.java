@@ -43,84 +43,6 @@ public class ClientController {
         });
     }
 
-    @PostMapping("/client")
-    public Client createClient(@RequestBody Map<String, Object> newClient) {
-        String createClientQuery = """
-                insert into client (id, name, phone_number, birth_at, member_id)
-                values (?, ?, ?, ?, ?)
-                """;
-        String clientId = UUID.randomUUID().toString();
-        Cabinet newCabinet = null;
-
-        Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
-        List<Map<String, Object>> products = (List) newClient.get("products");
-        List<Product> newProducts = new ArrayList<>();
-
-        String memberId = null;
-        String phoneNumber = null;
-        String birthAt = null;
-        if (newClient.get("memberId") != null)
-            memberId = newClient.get("memberId").toString();
-
-        if (newClient.get("phoneNumber") != null)
-            phoneNumber = newClient.get("phoneNumber").toString();
-
-        if (newClient.get("birthAt") != null)
-            birthAt = newClient.get("birthAt").toString();
-
-        this.repo.update(createClientQuery,
-                clientId,
-                newClient.get("name").toString(),
-                phoneNumber,
-                birthAt,
-                memberId);
-
-        if (cabinet != null) {
-            newCabinet = new Cabinet();
-            newCabinet.setId((int) cabinet.get("id"));
-            newCabinet.setStartAt(cabinet.get("start_at").toString());
-            newCabinet.setExpireAt(cabinet.get("expire_at").toString());
-            this.repo.update("""
-                             insert into cabinet(id, start_at, expire_at)
-                             values (?, ?, ?)
-                            """, cabinet.get("id"),
-                    cabinet.get("start_at"),
-                    cabinet.get("expire_at"));
-            this.repo.update("""
-                            insert into member(client, cabinet)
-                            values (?, ?)
-                            """,
-                    clientId, cabinet.get("id"));
-        }
-
-        if (products != null) {
-            products.forEach(product -> {
-                Product newProduct = new Product();
-
-                newProduct.setName(product.get("name").toString());
-                newProduct.setStart_at(product.get("start_at").toString());
-                newProduct.setExpire_at(product.get("expire_at").toString());
-
-                newProducts.add(newProduct);
-
-                this.repo.update("""
-                        insert into member_product(client, product, start_at, expire_at)
-                        values (?, ?, ?, ?);
-                        """, clientId, newProduct.getName(), newProduct.getStart_at(), newProduct.getExpire_at());
-            });
-        }
-
-        return Client.builder()
-                .id(clientId)
-                .name(newClient.get("name").toString())
-                .phoneNumber(phoneNumber)
-                .birthAt(birthAt)
-                .memberId(memberId)
-                .cabinet(newCabinet)
-                .products(newProducts)
-                .build();
-    }
-
     @GetMapping("/client/{id}")
     public Object getClientInfo(@PathVariable("id") String clientId) {
         String findClientQuery = """
@@ -183,8 +105,89 @@ public class ClientController {
         });
     }
 
+    @PostMapping("/client")
+    public Client createClient(@RequestBody Map<String, Object> newClient) {
+        String createClientQuery = """
+                insert into client (id, name, phone_number, birth_at, member_id)
+                values (?, ?, ?, ?, ?)
+                """;
+        String clientId = UUID.randomUUID().toString();
+
+        Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
+        List<Map<String, Object>> products = (List) newClient.get("products");
+        List<Product> newProducts = new ArrayList<>();
+
+        String memberId = null;
+        String phoneNumber = null;
+        String birthAt = null;
+        if (newClient.get("memberId") != null)
+            memberId = newClient.get("memberId").toString();
+
+        if (newClient.get("phoneNumber") != null)
+            phoneNumber = newClient.get("phoneNumber").toString();
+
+        if (newClient.get("birthAt") != null)
+            birthAt = newClient.get("birthAt").toString();
+
+        this.repo.update(createClientQuery,
+                clientId,
+                newClient.get("name").toString(),
+                phoneNumber,
+                birthAt,
+                memberId);
+
+        if (cabinet != null) {
+            Cabinet nc = getCabinet((int)cabinet.get("id"), cabinet.get("start_at").toString(), cabinet.get("expire_at").toString());
+
+            CabinetService cabinetService = new CabinetService(this.repo);
+
+            try{
+                cabinetService.addCabinet(nc);
+                cabinetService.addMemberCabinet(clientId, nc.getId());
+            } catch(Exception e) {
+                System.out.println("cabinet error: "+e.getMessage());
+            }
+        }
+
+        if (products != null) {
+            products.forEach(product -> {
+                Product newProduct = new Product();
+
+                newProduct.setName(product.get("name").toString());
+                newProduct.setStart_at(product.get("start_at").toString());
+                newProduct.setExpire_at(product.get("expire_at").toString());
+
+                newProducts.add(newProduct);
+
+                this.repo.update("""
+                        insert into member_product(client, product, start_at, expire_at)
+                        values (?, ?, ?, ?);
+                        """, clientId, newProduct.getName(), newProduct.getStart_at(), newProduct.getExpire_at());
+            });
+        }
+
+        return Client.builder()
+                .id(clientId)
+                .name(newClient.get("name").toString())
+                .phoneNumber(phoneNumber)
+                .birthAt(birthAt)
+                .memberId(memberId)
+                .cabinet(cabinet == null ? null : new Cabinet())
+                .products(newProducts)
+                .build();
+    }
+
     @PutMapping("/client/{id}")
     public Client editClient(@PathVariable("id") String clientId) {
         return new Client("","","","","", new Cabinet(), new ArrayList<>());
+    }
+
+    public Cabinet getCabinet(int id, String startAt, String expireAt) {
+        Cabinet cabinet = new Cabinet();
+        cabinet.setId(id);
+        cabinet.setStartAt(startAt);
+        cabinet.setExpireAt(expireAt);
+
+        return cabinet;
     }
 }
