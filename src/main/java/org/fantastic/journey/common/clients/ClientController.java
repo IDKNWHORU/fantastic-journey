@@ -45,22 +45,21 @@ public class ClientController {
     @GetMapping("/client/{id}")
     public Object getClientInfo(@PathVariable("id") String clientId) {
         String findClientQuery = """
-                WITH mpvt AS (
+                WITH member_product_view_table AS (
                     SELECT client, group_concat(concat(mp.PRODUCT, ';', mp.start_at, ';', mp.expire_at)) AS products
                       FROM MEMBER_PRODUCT mp
                      GROUP BY CLIENT
                       )
-                SELECT cl.id, cl.name, cl.PHONE_NUMBER, cl.birth_at, cl.MEMBER_ID, mb.CABINET, cb.START_AT, cb.EXPIRE_AT, mpvt.products
+                SELECT cl.id, cl.name, cl.PHONE_NUMBER, cl.birth_at, cl.MEMBER_ID, mb.CABINET, cb.START_AT, cb.EXPIRE_AT, member_product_view_table.products
                   FROM client cl
                   LEFT JOIN member mb
                     ON cl.id = mb.client
                   LEFT JOIN cabinet cb
                     ON mb.CABINET = cb.id
-                  LEFT JOIN mpvt
-                    ON cl.id = mpvt.client
+                  LEFT JOIN member_product_view_table
+                    ON cl.id = member_product_view_table.client
                  WHERE cl.id = ?
                 """;
-
 
         return repo.query(findClientQuery, new Object[]{clientId}, (rs) -> {
             List<Client> clients = new ArrayList<>();
@@ -124,17 +123,9 @@ public class ClientController {
             cabinetService.addCabinet(newCabinet);
         }
 
-        String memberId = null;
-        String phoneNumber = null;
-        String birthAt = null;
-        if (newClient.get("memberId") != null)
-            memberId = newClient.get("memberId").toString();
-
-        if (newClient.get("phoneNumber") != null)
-            phoneNumber = newClient.get("phoneNumber").toString();
-
-        if (newClient.get("birthAt") != null)
-            birthAt = newClient.get("birthAt").toString();
+        String memberId = (newClient.get("memberId") == null) ? null : newClient.get("memberId").toString();
+        String phoneNumber = (newClient.get("phoneNumber") == null) ? null : newClient.get("phoneNumber").toString();
+        String birthAt = (newClient.get("birthAt") == null) ? null : newClient.get("birthAt").toString();
 
         try {
             this.repo.update(createClientQuery,
@@ -187,7 +178,29 @@ public class ClientController {
     }
 
     @PutMapping("/client/{id}")
-    public Client editClient(@PathVariable("id") String clientId) {
+    public Client editClient(@PathVariable("id") String clientId, @RequestBody Map<String, Object> editedClient) {
+        String updateClientQuery = """
+                update client
+                   set name = ?,
+                       phone_number = ?,
+                       birth_at = ?,
+                       member_id = ?
+                 where id = ?;
+                """;
+
+        List<Client> beforeClientData = (List)getClientInfo(clientId);
+
+        for(Client client: beforeClientData) {
+            System.out.println("beforeData" + client.toString());
+        }
+
+        this.repo.update(updateClientQuery,
+                editedClient.get("name"),
+                editedClient.get("phoneNumber"),
+                editedClient.get("birthAt"),
+                editedClient.get("memberId"),
+                clientId);
+
         return new Client("","","","","", new Cabinet(), new ArrayList<>());
     }
 
