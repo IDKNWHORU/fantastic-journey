@@ -43,7 +43,7 @@ public class ClientController {
     }
 
     @GetMapping("/client/{id}")
-    public Object getClientInfo(@PathVariable("id") String clientId) {
+    public List<Client> getClientInfo(@PathVariable("id") String clientId) {
         String findClientQuery = """
                 WITH member_product_view_table AS (
                     SELECT client, group_concat(concat(mp.PRODUCT, ';', mp.start_at, ';', mp.expire_at)) AS products
@@ -184,7 +184,7 @@ public class ClientController {
                  where id = ?;
                 """;
 
-        List<Client> beforeClientData = (List)getClientInfo(clientId);
+        List<Client> beforeClientData = getClientInfo(clientId);
 
         for(Client client: beforeClientData) {
             System.out.println("beforeData" + client.toString());

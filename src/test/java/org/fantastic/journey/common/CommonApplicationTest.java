@@ -6,16 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class CommonApplicationTest {
+    private final ClientController controller;
 
     @Autowired
-    private ClientController controller;
+    public CommonApplicationTest(ClientController controller) {
+        this.controller = controller;
+    }
 
     @Test
     public void contextLoads(){
@@ -35,7 +37,7 @@ public class CommonApplicationTest {
         Client client = Client.builder().id(id).name("hong gil dong").build();
 
         controller.addClient(client);
-        List<Client> client2 = (ArrayList<Client>)controller.getClientInfo(id);
+        List<Client> client2 = controller.getClientInfo(id);
 
         checkSameClient(client, client2.get(0));
     }
