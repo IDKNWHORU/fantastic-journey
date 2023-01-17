@@ -105,10 +105,6 @@ public class ClientController {
 
     @PostMapping("/client")
     public Client createClient(@RequestBody Map<String, Object> newClient) {
-        String createClientQuery = """
-                insert into client (id, name, phone_number, birth_at, member_id)
-                values (?, ?, ?, ?, ?)
-                """;
         String clientId = UUID.randomUUID().toString();
 
         Map<String, Object> cabinet = (Map) newClient.getOrDefault("cabinet", null);
@@ -128,12 +124,12 @@ public class ClientController {
         String birthAt = (newClient.get("birthAt") == null) ? null : newClient.get("birthAt").toString();
 
         try {
-            this.repo.update(createClientQuery,
-                clientId,
-                newClient.get("name").toString(),
-                phoneNumber,
-                birthAt,
-                memberId);
+            addClient(Client.builder()
+                    .id(clientId)
+                    .name(newClient.get("name").toString())
+                    .phoneNumber(phoneNumber)
+                    .birthAt(birthAt)
+                    .memberId(memberId).build());
         } catch (Exception e) {
             if(newCabinet != null) {
                 CabinetService cabinetService = new CabinetService(this.repo);
@@ -230,5 +226,12 @@ public class ClientController {
         cabinet.setExpireAt(expireAt);
 
         return cabinet;
+    }
+
+    public void addClient(Client client) {
+        this.repo.update("""
+                insert into client (id, name, phone_number, birth_at, member_id)
+                values (?, ?, ?, ?, ?)
+                """, client.getId(), client.getName(), client.getPhoneNumber(), client.getBirthAt(), client.getMemberId());
     }
 }
