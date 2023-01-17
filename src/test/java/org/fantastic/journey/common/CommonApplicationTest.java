@@ -1,7 +1,7 @@
 package org.fantastic.journey.common;
 
 import org.fantastic.journey.common.clients.Client;
-import org.fantastic.journey.common.clients.ClientController;
+import org.fantastic.journey.common.clients.ClientDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,21 +12,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class CommonApplicationTest {
-    private final ClientController controller;
+    private final ClientDao clientDao;
 
     @Autowired
-    public CommonApplicationTest(ClientController controller) {
-        this.controller = controller;
+    public CommonApplicationTest(ClientDao clientDao) {
+        this.clientDao = clientDao;
     }
 
     @Test
     public void contextLoads(){
-        assertThat(controller).isNotNull();
+        assertThat(clientDao).isNotNull();
     }
 
     @Test
     public void emptyGetClientWillEmptyList() {
-        List<Client> emptyList =  controller.getClients();
+        List<Client> emptyList =  clientDao.getAll();
 
         assertThat(emptyList.size()).isZero();
     }
@@ -36,10 +36,10 @@ public class CommonApplicationTest {
         String id = "550e8400-e29b-41d4-a716-446655440000";
         Client client = Client.builder().id(id).name("hong gil dong").build();
 
-        controller.addClient(client);
-        List<Client> client2 = controller.getClientInfo(id);
+        clientDao.add(client);
+        Client client2 = clientDao.get(id);
 
-        checkSameClient(client, client2.get(0));
+        checkSameClient(client, client2);
     }
 
     private void checkSameClient(Client client, Client client2) {
