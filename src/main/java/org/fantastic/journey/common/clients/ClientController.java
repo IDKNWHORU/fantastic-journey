@@ -13,14 +13,14 @@ public class ClientController {
     @Autowired
     private final ClientDao clientDao;
     @Autowired
-    private final ProductDao productDao;
+    private final MemberProductDao productDao;
     @Autowired
     private final CabinetDao cabinetDao;
 
     @Autowired
     private final MemberDao memberDao;
 
-    public ClientController(ClientDao clientDao, ProductDao productDao, CabinetDao cabinetDao, MemberDao memberDao) {
+    public ClientController(ClientDao clientDao, MemberProductDao productDao, CabinetDao cabinetDao, MemberDao memberDao) {
         this.clientDao = clientDao;
         this.productDao = productDao;
         this.cabinetDao = cabinetDao;

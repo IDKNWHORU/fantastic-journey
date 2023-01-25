@@ -1,17 +1,17 @@
 package org.fantastic.journey.common;
 
 import org.fantastic.journey.common.clients.Product;
-import org.fantastic.journey.common.clients.ProductDao;
+import org.fantastic.journey.common.clients.MemberProductDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class ProductDaoTest {
-    private final ProductDao productDao;
+public class MemberProductDaoTest {
+    private final MemberProductDao productDao;
 
     @Autowired
-    public ProductDaoTest(ProductDao productDao) {
+    public MemberProductDaoTest(MemberProductDao productDao) {
         this.productDao = productDao;
     }
 
