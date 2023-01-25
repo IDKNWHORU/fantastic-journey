@@ -1,5 +1,13 @@
 package org.fantastic.journey.common.clients;
 
+import org.fantastic.journey.common.clients.dao.CabinetDao;
+import org.fantastic.journey.common.clients.dao.ClientDao;
+import org.fantastic.journey.common.clients.dao.MemberDao;
+import org.fantastic.journey.common.clients.dao.MemberProductDao;
+import org.fantastic.journey.common.clients.model.Cabinet;
+import org.fantastic.journey.common.clients.model.Client;
+import org.fantastic.journey.common.clients.model.Member;
+import org.fantastic.journey.common.clients.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

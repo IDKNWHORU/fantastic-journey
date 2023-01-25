@@ -1,5 +1,6 @@
-package org.fantastic.journey.common.clients;
+package org.fantastic.journey.common.clients.dao;
 
+import org.fantastic.journey.common.clients.model.Cabinet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

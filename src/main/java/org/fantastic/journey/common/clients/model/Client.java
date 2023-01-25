@@ -1,4 +1,4 @@
-package org.fantastic.journey.common.clients;
+package org.fantastic.journey.common.clients.model;
 
 import lombok.Builder;
 import lombok.Getter;

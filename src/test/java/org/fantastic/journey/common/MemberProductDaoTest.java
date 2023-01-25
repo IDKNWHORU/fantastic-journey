@@ -1,7 +1,7 @@
 package org.fantastic.journey.common;
 
-import org.fantastic.journey.common.clients.Product;
-import org.fantastic.journey.common.clients.MemberProductDao;
+import org.fantastic.journey.common.clients.model.Product;
+import org.fantastic.journey.common.clients.dao.MemberProductDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
