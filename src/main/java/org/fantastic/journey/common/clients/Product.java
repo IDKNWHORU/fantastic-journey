@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class Product {
     private String name;
-    private String start_at;
-    private String expire_at;
+    private String startAt;
+    private String expireAt;
 }

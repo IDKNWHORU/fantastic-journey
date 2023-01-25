@@ -79,8 +79,8 @@ public class ClientDao {
                             Product product = new Product();
 
                             product.setName(productInfo[0]);
-                            product.setStart_at(productInfo[1]);
-                            product.setExpire_at(productInfo[2]);
+                            product.setStartAt(productInfo[1]);
+                            product.setExpireAt(productInfo[2]);
 
                             memberProduct.add(product);
                         }

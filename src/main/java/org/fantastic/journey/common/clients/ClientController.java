@@ -80,8 +80,8 @@ public class ClientController {
                 Product newProduct = new Product();
 
                 newProduct.setName(product.get("name").toString());
-                newProduct.setStart_at(product.get("start_at").toString());
-                newProduct.setExpire_at(product.get("expire_at").toString());
+                newProduct.setStartAt(product.get("start_at").toString());
+                newProduct.setExpireAt(product.get("expire_at").toString());
 
                 newProducts.add(newProduct);
 
