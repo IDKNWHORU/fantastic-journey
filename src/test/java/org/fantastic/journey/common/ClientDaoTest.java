@@ -13,11 +13,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class HealthManagerApplicationTest {
+public class ClientDaoTest {
     private final ClientDao clientDao;
 
     @Autowired
-    public HealthManagerApplicationTest(ClientDao clientDao) {
+    public ClientDaoTest(ClientDao clientDao) {
         this.clientDao = clientDao;
     }
 
