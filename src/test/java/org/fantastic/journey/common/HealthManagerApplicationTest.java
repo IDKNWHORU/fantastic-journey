@@ -2,9 +2,11 @@ package org.fantastic.journey.common;
 
 import org.fantastic.journey.common.clients.Client;
 import org.fantastic.journey.common.clients.ClientDao;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.List;
 
@@ -35,6 +37,13 @@ public class HealthManagerApplicationTest {
         Client client2 = clientDao.get(id);
 
         checkSameClient(client, client2);
+    }
+
+    @Test
+    public void notFoundClientWillThrowEmptyResultDataAccessException() {
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            clientDao.get("hello-unknown-user-id");
+        });
     }
 
     private void checkSameClient(Client client, Client client2) {
