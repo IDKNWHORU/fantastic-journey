@@ -23,15 +23,6 @@ public class CabinetDao {
         return 1;
     }
 
-    public int addConstraintMember(String client, int cabinet) {
-        this.jdbcTemplate.update("""
-                insert into member(client, cabinet)
-                values (?, ?)
-                """, client, cabinet);
-
-        return 1;
-    }
-
     public int delete(int cabinet) {
         this.jdbcTemplate.update("""
                 delete from cabinet

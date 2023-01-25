@@ -17,10 +17,14 @@ public class ClientController {
     @Autowired
     private final CabinetDao cabinetDao;
 
-    public ClientController(ClientDao clientDao, ProductDao productDao, CabinetDao cabinetDao) {
+    @Autowired
+    private final MemberDao memberDao;
+
+    public ClientController(ClientDao clientDao, ProductDao productDao, CabinetDao cabinetDao, MemberDao memberDao) {
         this.clientDao = clientDao;
         this.productDao = productDao;
         this.cabinetDao = cabinetDao;
+        this.memberDao = memberDao;
     }
 
     @GetMapping("/clients")
@@ -67,7 +71,8 @@ public class ClientController {
         }
 
         if (newCabinet != null) {
-            cabinetDao.addConstraintMember(clientId, newCabinet.getId());
+            Member member = new Member(clientId, newCabinet.getId());
+            memberDao.add(member);
         }
 
         if (products != null) {
