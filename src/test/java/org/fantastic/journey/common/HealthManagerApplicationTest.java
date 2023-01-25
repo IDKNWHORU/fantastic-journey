@@ -11,17 +11,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class CommonApplicationTest {
+public class HealthManagerApplicationTest {
     private final ClientDao clientDao;
 
     @Autowired
-    public CommonApplicationTest(ClientDao clientDao) {
+    public HealthManagerApplicationTest(ClientDao clientDao) {
         this.clientDao = clientDao;
-    }
-
-    @Test
-    public void contextLoads(){
-        assertThat(clientDao).isNotNull();
     }
 
     @Test
