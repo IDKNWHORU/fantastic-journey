@@ -4,19 +4,19 @@ import org.fantastic.journey.common.clients.Cabinet;
 import org.fantastic.journey.common.clients.CabinetDao;
 import org.fantastic.journey.common.clients.Member;
 import org.fantastic.journey.common.clients.MemberDao;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 @SpringBootTest
-public class ClientServiceTest {
+public class CabinetDaoTest {
     private CabinetDao cabinetDao;
-    private MemberDao memberDao;
 
     @Autowired
-    public ClientServiceTest(CabinetDao cabinetDao, MemberDao memberDao){
+    public CabinetDaoTest(CabinetDao cabinetDao){
         this.cabinetDao = cabinetDao;
-        this.memberDao = memberDao;
     }
 
     @Test
@@ -33,9 +33,19 @@ public class ClientServiceTest {
     }
 
     @Test
-    public void createMember() {
-        Member member = new Member("550e8400-e29b-41d4-a716-446655440000", 1);
+    public void deleteCabinet() {
+        int deletedCabinetCount = cabinetDao.delete(1);
 
-        assert memberDao.add(member) == 1;
+        assert deletedCabinetCount == 1;
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            cabinetDao.get(1);
+        });
+    }
+
+    @Test
+    public void notExistDeleteCabinetWillZero() {
+        int deletedCabinetCount = cabinetDao.delete(100);
+
+        assert deletedCabinetCount == 0;
     }
 }
