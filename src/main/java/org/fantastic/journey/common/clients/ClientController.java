@@ -103,7 +103,7 @@ public class ClientController {
                 .phoneNumber(phoneNumber)
                 .birthAt(birthAt)
                 .memberId(memberId)
-                .cabinet(cabinet == null ? null : new Cabinet())
+                .cabinet(newCabinet)
                 .products(newProducts)
                 .build();
     }
