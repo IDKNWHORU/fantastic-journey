@@ -56,7 +56,7 @@ public class ClientControllerTest {
         List<Product> products1 = client1.getProducts();
         List<Product> products2 = client2.getProducts();
 
-        assert client1.getName().equals(client2.getName());
+        assertEquals(client1.getName(), client2.getName());
         assertEquals(cabinet1.getId(), cabinet2.getId());
         assertEquals(cabinet1.getStartAt(), cabinet2.getStartAt());
         assertEquals(cabinet1.getExpireAt(), cabinet2.getExpireAt());
