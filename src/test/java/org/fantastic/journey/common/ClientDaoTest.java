@@ -1,8 +1,9 @@
 package org.fantastic.journey.common;
 
-import org.fantastic.journey.common.clients.model.Client;
 import org.fantastic.journey.common.clients.dao.ClientDao;
+import org.fantastic.journey.common.clients.model.Client;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,11 @@ public class ClientDaoTest {
     @Autowired
     public ClientDaoTest(ClientDao clientDao) {
         this.clientDao = clientDao;
+    }
+
+    @BeforeEach
+    public void setUp() {
+        clientDao.deleteAll();
     }
 
     @Test

@@ -101,4 +101,10 @@ public class ClientDao {
                 }
         );
     }
+
+    public int deleteAll() {
+        return this.jdbcTemplate.update("""
+                  delete from client
+                """);
+    }
 }

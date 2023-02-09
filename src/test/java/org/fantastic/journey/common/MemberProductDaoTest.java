@@ -23,5 +23,6 @@ public class MemberProductDaoTest {
         product.setExpireAt("20230101");
 
         assert productDao.add("550e8400-e29b-41d4-a716-446655440000", product) == 1;
+        productDao.deleteAll();
     }
 }

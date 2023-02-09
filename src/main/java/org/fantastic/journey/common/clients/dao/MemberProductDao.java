@@ -20,4 +20,10 @@ public class MemberProductDao {
                 values (?, ?, ?, ?);
                 """, clientId, product.getName(), product.getStartAt(), product.getExpireAt());
     }
+
+    public int deleteAll() {
+        return this.jdbcTemplate.update("""
+                delete from member_product
+                """);
+    }
 }

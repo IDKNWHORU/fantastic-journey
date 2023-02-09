@@ -22,4 +22,10 @@ public class MemberDao {
 
         return 1;
     }
+
+    public int deleteAll() {
+        return this.jdbcTemplate.update("""
+                delete from member
+                """);
+    }
 }
