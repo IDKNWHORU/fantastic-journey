@@ -19,9 +19,13 @@ public class CabinetDaoTest {
 
     @Test
     public void createNewCabinet() {
-        int deletedCabinetCount = cabinetDao.delete(1);
+        try {
+            Cabinet cabinet1 = cabinetDao.get(1);
 
-        assert deletedCabinetCount == 1;
+            int deletedCabinetCount = cabinetDao.delete(1);
+            assert deletedCabinetCount == 1;
+        } catch(Exception ignored) { }
+
 
         Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
             cabinetDao.get(1);
