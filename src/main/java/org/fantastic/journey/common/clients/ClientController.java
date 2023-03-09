@@ -9,6 +9,7 @@ import org.fantastic.journey.common.clients.model.Client;
 import org.fantastic.journey.common.clients.model.Member;
 import org.fantastic.journey.common.clients.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,11 +29,15 @@ public class ClientController {
     @Autowired
     private final MemberDao memberDao;
 
-    public ClientController(ClientDao clientDao, MemberProductDao productDao, CabinetDao cabinetDao, MemberDao memberDao) {
+    @Autowired
+    private final TransactionTemplate transactionTemplate;
+
+    public ClientController(ClientDao clientDao, MemberProductDao productDao, CabinetDao cabinetDao, MemberDao memberDao, TransactionTemplate transactionTemplate) {
         this.clientDao = clientDao;
         this.productDao = productDao;
         this.cabinetDao = cabinetDao;
         this.memberDao = memberDao;
+        this.transactionTemplate = transactionTemplate;
     }
 
     @GetMapping("/clients")
@@ -53,59 +58,56 @@ public class ClientController {
         List<Map<String, Object>> products = (List) newClient.get("products");
         List<Product> newProducts = new ArrayList<>();
 
-        Cabinet newCabinet = cabinet == null ? null : getCabinet((int)cabinet.get("id"), cabinet.get("start_at").toString(), cabinet.get("expire_at").toString());
 
-        if(newCabinet != null) {
-            cabinetDao.add(newCabinet);
-        }
+        return transactionTemplate.execute(status -> {
+            try {
+                Cabinet newCabinet = cabinet == null ? null : getCabinet((int)cabinet.get("id"), cabinet.get("start_at").toString(), cabinet.get("expire_at").toString());
 
-        String memberId = (newClient.get("memberId") == null) ? null : newClient.get("memberId").toString();
-        String phoneNumber = (newClient.get("phoneNumber") == null) ? null : newClient.get("phoneNumber").toString();
-        String birthAt = (newClient.get("birthAt") == null) ? null : newClient.get("birthAt").toString();
+                String memberId = (newClient.get("memberId") == null) ? null : newClient.get("memberId").toString();
+                String phoneNumber = (newClient.get("phoneNumber") == null) ? null : newClient.get("phoneNumber").toString();
+                String birthAt = (newClient.get("birthAt") == null) ? null : newClient.get("birthAt").toString();
 
-        try {
-            this.clientDao.add(Client.builder()
-                    .id(clientId)
-                    .name(newClient.get("name").toString())
-                    .phoneNumber(phoneNumber)
-                    .birthAt(birthAt)
-                    .memberId(memberId).build());
-        } catch (Exception e) {
-            if(newCabinet != null) {
-                cabinetDao.delete(newCabinet.getId());
+                this.clientDao.add(Client.builder()
+                        .id(clientId)
+                        .name(newClient.get("name").toString())
+                        .phoneNumber(phoneNumber)
+                        .birthAt(birthAt)
+                        .memberId(memberId).build());
+
+                if (newCabinet != null) {
+                    cabinetDao.add(newCabinet);
+                    Member member = new Member(clientId, newCabinet.getId());
+                    memberDao.add(member);
+                }
+
+                if (products != null) {
+                    products.forEach(product -> {
+                        Product newProduct = new Product();
+
+                        newProduct.setName(product.get("name").toString());
+                        newProduct.setStartAt(product.get("start_at").toString());
+                        newProduct.setExpireAt(product.get("expire_at").toString());
+
+                        newProducts.add(newProduct);
+
+                        this.productDao.add(clientId, newProduct);
+                    });
+                }
+
+                return Client.builder()
+                        .id(clientId)
+                        .name(newClient.get("name").toString())
+                        .phoneNumber(phoneNumber)
+                        .birthAt(birthAt)
+                        .memberId(memberId)
+                        .cabinet(newCabinet)
+                        .products(newProducts)
+                        .build();
+            }catch (Exception ex) {
+                status.setRollbackOnly();
+                throw ex;
             }
-
-            throw new Error("Error cause by creating client" + e.getMessage());
-        }
-
-        if (newCabinet != null) {
-            Member member = new Member(clientId, newCabinet.getId());
-            memberDao.add(member);
-        }
-
-        if (products != null) {
-            products.forEach(product -> {
-                Product newProduct = new Product();
-
-                newProduct.setName(product.get("name").toString());
-                newProduct.setStartAt(product.get("start_at").toString());
-                newProduct.setExpireAt(product.get("expire_at").toString());
-
-                newProducts.add(newProduct);
-
-                this.productDao.add(clientId, newProduct);
-            });
-        }
-
-        return Client.builder()
-                .id(clientId)
-                .name(newClient.get("name").toString())
-                .phoneNumber(phoneNumber)
-                .birthAt(birthAt)
-                .memberId(memberId)
-                .cabinet(newCabinet)
-                .products(newProducts)
-                .build();
+        });
     }
 //
 //    @PutMapping("/client/{id}")
